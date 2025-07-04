@@ -7,6 +7,7 @@
 6.修复 BurpAPIFinder和BurpFingerPrint在同目录下json文件冲突的问题  
 7.内置2W+指纹
 
+参考： https://github.com/xhmcc/ehole_finger
 # 原插件README
 # Burp 指纹识别
 ![](https://img.shields.io/badge/Author-Shaun-blue)
