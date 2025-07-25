@@ -100,16 +100,16 @@ public class IProxyScanner implements IProxyListener {
             // 提取url，过滤掉静态文件
             String url = String.valueOf(helpers.analyzeRequest(resrsp).getUrl());
             if (Utils.isStaticFile(url) && !url.contains("favicon.") && !url.contains(".ico")){
-                BurpExtender.getStdout().println("[+]静态文件，不进行url识别：" + url);
+                //BurpExtender.getStdout().println("[+]静态文件，不进行url识别：" + url);
                 return;
             }
             if (Utils.isWhiteDomain(url)){
-                BurpExtender.getStdout().println("[+]域名白名单，不进行url识别：" + url);
+                //BurpExtender.getStdout().println("[+]域名白名单，不进行url识别：" + url);
                 return;
             }
             byte[] responseBytes = requestResponse.getResponse();
             if (!Utils.isProbablyPlainText(responseBytes)) {
-                BurpExtender.getStdout().println("[+]响应可能是加密数据，不进行url识别：" + url);
+                //BurpExtender.getStdout().println("[+]响应可能是加密数据，不进行url识别：" + url);
                 return; // 响应可能是加密数据，跳过指纹匹配
             }
             // 网页提取URL并进行指纹识别
@@ -185,7 +185,7 @@ public class IProxyScanner implements IProxyListener {
                             ifInsertWeakPasswordDatabase(mapResult);
                             BurpExtender.getStdout().println(mapResult);
                         }
-                        BurpExtender.getStdout().println("[END]指纹识别结束: " + totalUrlResponse);
+                        //BurpExtender.getStdout().println("[END]指纹识别结束: " + totalUrlResponse);
                     }
                 }
             });

@@ -376,31 +376,31 @@ public class FingerTab implements IMessageEditorController {
 
         // 添加ListSelectionListener来监听行选择事件
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                                                               public void valueChanged(ListSelectionEvent event) {
-                                                                   if (!event.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                                                                       // 在这里获取选中行的数据
-                                                                       int selectedRow = table.getSelectedRow();
+           public void valueChanged(ListSelectionEvent event) {
+               if (!event.getValueIsAdjusting() && table.getSelectedRow() != -1) {
+                   // 在这里获取选中行的数据
+                   int selectedRow = table.getSelectedRow();
 
-                                                                       // 根据您的数据模型结构获取数据
-                                                                       String url = model.getValueAt(selectedRow, 2).toString();
-                                                                       TableLogModel logModel = BurpExtender.getDataBaseService().getTableDataByUrl(url);
-                                                                       resultDeViewer.setText(logModel.getResultInfo().getBytes());
-                                                                       Map<String, byte[]> requestResponse = BurpExtender.getDataBaseService().selectRequestResponseById(logModel.getRequestResponseIndex());
+                   // 根据您的数据模型结构获取数据
+                   String url = model.getValueAt(selectedRow, 2).toString();
+                   TableLogModel logModel = BurpExtender.getDataBaseService().getTableDataByUrl(url);
+                   resultDeViewer.setText(logModel.getResultInfo().getBytes());
+                   Map<String, byte[]> requestResponse = BurpExtender.getDataBaseService().selectRequestResponseById(logModel.getRequestResponseIndex());
 
-                                                                       if (requestResponse != null) {
-                                                                           // 提取请求和响应数据
-                                                                           byte[] requestBytes = requestResponse.get("request");
-                                                                           byte[] responseBytes = requestResponse.get("response");
+                   if (requestResponse != null) {
+                       // 提取请求和响应数据
+                       byte[] requestBytes = requestResponse.get("request");
+                       byte[] responseBytes = requestResponse.get("response");
 
-                                                                           // 现在你可以使用这些字节数据了
-                                                                           // 例如，你可以将它们设置到一个 HTTP 消息编辑器组件中
-                                                                           requestViewer.setMessage(requestBytes, true); // true 表示请求消息
-                                                                           responseViewer.setMessage(responseBytes, false); // false 表示响应消息
-                                                                       }
+                       // 现在你可以使用这些字节数据了
+                       // 例如，你可以将它们设置到一个 HTTP 消息编辑器组件中
+                       requestViewer.setMessage(requestBytes, true); // true 表示请求消息
+                       responseViewer.setMessage(responseBytes, false); // false 表示响应消息
+                   }
 
-                                                                   }
-                                                               }
-                                                           });
+               }
+           }
+       });
 
         // 添加点击事件监听器
         btnClear.addActionListener(FingerTabEventHandlers.btnClearAddActionListener(model, lbRequestCount, lbSuccessCount));

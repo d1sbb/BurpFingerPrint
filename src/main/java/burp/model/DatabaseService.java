@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DatabaseService {
 
@@ -141,6 +143,14 @@ public class DatabaseService {
                 for (String oneRs : logEntry.getResult().split(", ")){
                     if (!result.contains(oneRs)){
                         result = result + ", " + oneRs;
+                    }else{
+                        String oldResultInfo = logEntry.getResultInfo();
+                        // (?s) 开启 DOTALL 模式，使 . 匹配换行符
+                        // 非贪婪匹配从 Time 到 keyword 的段落
+                        Pattern pattern = Pattern.compile("(?s)Time:.*?cms:\\s*"+oneRs+".*?keyword:.*?(\\n|$)");
+                        Matcher matcher = pattern.matcher(oldResultInfo);
+                        String newResultInfo = matcher.replaceAll("");
+                        logEntry.setResultInfo(newResultInfo);
                     }
                 }
 
