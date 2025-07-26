@@ -2,7 +2,6 @@ package burp.model;
 
 import burp.BurpExtender;
 import burp.util.Utils;
-import com.google.gson.Gson;
 
 import java.nio.file.Paths;
 import java.sql.*;
@@ -12,10 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class DatabaseService {
 
@@ -138,22 +134,30 @@ public class DatabaseService {
                 String result = rs.getString("result");
                 String status = rs.getString("status");
                 Boolean isImportant = rs.getBoolean("is_important");
+                String resultInfo = rs.getString("result_info");
                 int request_response_index = rs.getInt("request_response_index");
-
+                StringBuilder newResultInfo = new StringBuilder();
                 for (String oneRs : logEntry.getResult().split(", ")){
                     if (!result.contains(oneRs)){
                         result = result + ", " + oneRs;
-                    }else{
                         String oldResultInfo = logEntry.getResultInfo();
-                        // (?s) 开启 DOTALL 模式，使 . 匹配换行符
-                        // 非贪婪匹配从 Time 到 keyword 的段落
-                        Pattern pattern = Pattern.compile("(?s)Time:.*?cms:\\s*"+oneRs+".*?keyword:.*?(\\n|$)");
-                        Matcher matcher = pattern.matcher(oldResultInfo);
-                        String newResultInfo = matcher.replaceAll("");
-                        logEntry.setResultInfo(newResultInfo);
+                        //拿到新的结果 放到newResultInfo以去重后续logEntry
+                        if(!oldResultInfo.isEmpty()){
+                            List<String> results = new ArrayList<>();
+                            String[] segments = oldResultInfo.split("(?=Time: )"); // 保留 Time 开头
+
+                            for (String segment : segments) {
+                                if (segment.contains("cms: " + oneRs)) {
+                                    results.add(segment);//删除空行 segment.trim()
+                                }
+                            }
+                            for (String s : results) {
+                                newResultInfo.append(s);
+                            }
+                        }
                     }
                 }
-
+                logEntry.setResultInfo(String.valueOf(newResultInfo));
                 String type = rs.getString("type");
                 for (String oneType : logEntry.getType().split(", ")){
                     if (!type.contains(oneType)){
@@ -177,7 +181,12 @@ public class DatabaseService {
                     updateStmt.setString(4, result);
                     updateStmt.setString(5, type);
                     updateStmt.setBoolean(6, isImportant);
-                    updateStmt.setString(7, rs.getString("result_info") + "\r\n\r\n" + logEntry.getResultInfo());
+                    String logEntryResultInfo = logEntry.getResultInfo();
+                    if(logEntryResultInfo.isEmpty()){
+                        updateStmt.setString(7, rs.getString("result_info"));
+                    }else{
+                        updateStmt.setString(7, rs.getString("result_info") + "\r\n\r\n" + logEntryResultInfo);
+                    }
                     updateStmt.setString(8, logEntry.getHost());
                     updateStmt.setInt(9, logEntry.getPort());
                     updateStmt.setString(10, logEntry.getProtocol());
